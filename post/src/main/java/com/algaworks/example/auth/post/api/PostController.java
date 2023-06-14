@@ -2,6 +2,7 @@ package com.algaworks.example.auth.post.api;
 
 
 import com.algaworks.example.auth.post.client.UserClient;
+import com.algaworks.example.auth.post.client.UserReactiveClient;
 import com.algaworks.example.auth.post.domain.Post;
 import com.algaworks.example.auth.post.domain.PostRepository;
 import com.algaworks.example.auth.post.security.CanWritePosts;
@@ -27,11 +28,12 @@ public class PostController {
 	
 	private final PostRepository postRepository;
 	private final SecurityService securityService;
-	private final UserClient userClient;
+//	private final UserClient userClient;
+	private final UserReactiveClient userClient;
 
 	public PostController(PostRepository postRepository, 
-	                      SecurityService securityService, 
-	                      UserClient userClient) {
+	                      SecurityService securityService,
+						  UserReactiveClient userClient) {
 		this.postRepository = postRepository;
 		this.securityService = securityService;
 		this.userClient = userClient;
@@ -53,7 +55,10 @@ public class PostController {
 	public PostDetailedResponse create(@RequestBody @Valid PostRequest postRequest) {
 		final Post post = new Post(securityService.getUserId(), postRequest.getTitle(), postRequest.getContent());
 		postRepository.save(post);
-		return PostDetailedResponse.of(post);
+		return userClient.findById(post.getEditorId())
+				.map(userResponse -> PostDetailedResponse.of(post, EditorResponse.of(userResponse)))
+				.blockOptional()
+				.orElseGet(() -> PostDetailedResponse.of(post));
 	}
 
 	@GetMapping("/{id}")
@@ -62,6 +67,7 @@ public class PostController {
 
 		return userClient.findById(post.getEditorId())
 				.map(userResponse -> PostDetailedResponse.of(post, EditorResponse.of(userResponse)))
+				.blockOptional()
 				.orElseGet(() -> PostDetailedResponse.of(post));
 	}
 }

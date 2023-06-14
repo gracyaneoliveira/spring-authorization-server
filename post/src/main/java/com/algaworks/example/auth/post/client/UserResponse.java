@@ -6,6 +6,9 @@ public class UserResponse {
     private String name;
     private UserType type;
 
+    public UserResponse () {
+
+    }
     public UserResponse(Long id, String email, String name, UserType type) {
         this.id = id;
         this.email = email;
