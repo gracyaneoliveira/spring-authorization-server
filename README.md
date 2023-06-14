@@ -27,8 +27,11 @@ Os **resource-server** irão carregar sua chave pública do endpoint http://loca
 
 Na API somente os usuário admin podem criar um usuário admin. Qualquer outro usuário pode criar usuário editores dos posts. Somente admins podem listar usuários e buscar por id. Todos os usuários podem ver as publicações. Somente usuários autenticados podem criar publicações.
 
-```sql
+**Schemas** - Spring Session e OAuth JDBC
 
+Gravar no banco tanto as sessões de autenticação como as aplicações clients que podem receber token para fazer requisições
+
+```sql
 # SPRING SESSION
 
 CREATE TABLE SPRING_SESSION (
@@ -122,3 +125,21 @@ CREATE TABLE oauth2_authorization_consent (
     PRIMARY KEY (registered_client_id, principal_name)
 );
 ``` 
+
+**Urls**
+```
+# Get token to Client Credentials, Authorization Code and Refresh Token
+http://localhost:8082/oauth2/token
+
+# Inspect JWT
+http://localhost:8082/oauth2/introspect
+
+# Revoke Refresh token
+http://localhost:8082/oauth2/revoke
+
+# Get public certificate to be used Client Credentials
+http://localhost:8082/oauth2/jwks
+
+# Get Authorization Code
+http://localhost:8082/oauth2/authorize
+```
